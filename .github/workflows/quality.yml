@@ -39,3 +39,52 @@ jobs:
 
       - name: Run visual smoke tests
         run: SKIP_VISUAL_BASELINES=1 npm run test:e2e
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for /cas/
+        run: npm run build:cas
+
+      - name: Configure SSH
+        env:
+          CAS_DEPLOY_HOST: ${{ secrets.CAS_DEPLOY_HOST }}
+          CAS_DEPLOY_PORT: ${{ secrets.CAS_DEPLOY_PORT || '22' }}
+          CAS_DEPLOY_SSH_KEY: ${{ secrets.CAS_DEPLOY_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$CAS_DEPLOY_SSH_KEY" > ~/.ssh/cas_deploy_key
+          chmod 600 ~/.ssh/cas_deploy_key
+          ssh-keyscan -p "$CAS_DEPLOY_PORT" -H "$CAS_DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy static files
+        env:
+          CAS_DEPLOY_HOST: ${{ secrets.CAS_DEPLOY_HOST }}
+          CAS_DEPLOY_PORT: ${{ secrets.CAS_DEPLOY_PORT || '22' }}
+          CAS_DEPLOY_USER: ${{ secrets.CAS_DEPLOY_USER }}
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/cas_deploy_key -p $CAS_DEPLOY_PORT -o IdentitiesOnly=yes" \
+            dist/ "$CAS_DEPLOY_USER@$CAS_DEPLOY_HOST:/usr/share/caddy/cas/"
+
+      - name: Verify production deployment
+        run: |
+          curl -fsSIL --max-time 20 https://raawww.com/cas/ >/dev/null
+          asset_path="$(grep -o '/cas/assets/[^"]*' dist/index.html | head -n 1)"
+          test -n "$asset_path"
+          curl -fsSIL --max-time 20 "https://raawww.com$asset_path" >/dev/null
