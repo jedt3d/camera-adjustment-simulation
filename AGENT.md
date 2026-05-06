@@ -4,7 +4,7 @@
 
 Camera Adjustment Simulation is a small Vite + TypeScript photography teaching app with eight interactive pages. It renders with inline SVG/CSS-composed visuals and plain DOM controls.
 
-Remote repository: `git@github.com:jedt3d/camera-simulation.git`
+Remote repository: `git@github.com:jedt3d/camera-adjustment-simulation.git`
 
 ## Commands
 

@@ -93,13 +93,13 @@ The app intentionally avoids a large frontend framework. Most behavior is writte
 GitHub repository:
 
 ```text
-git@github.com:jedt3d/camera-simulation.git
+git@github.com:jedt3d/camera-adjustment-simulation.git
 ```
 
 Web URL:
 
 ```text
-https://github.com/jedt3d/camera-simulation
+https://github.com/jedt3d/camera-adjustment-simulation
 ```
 
 ## Project Structure

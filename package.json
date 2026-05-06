@@ -1,12 +1,12 @@
 {
-  "name": "camera-simulation",
+  "name": "camera-adjustment-simulation",
   "private": true,
   "version": "0.1.0",
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/jedt3d/camera-simulation.git"
+    "url": "git+ssh://git@github.com/jedt3d/camera-adjustment-simulation.git"
   },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
